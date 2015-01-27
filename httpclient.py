@@ -21,6 +21,7 @@
 import sys
 import socket
 import re
+
 # you may use urllib to encode data appropriately
 import urllib
 
@@ -45,25 +46,25 @@ class HTTPClient(object):
             print "Hostname couldn't be resolved"
             sys.exit()
             
-     
-        
+         
     def connect(self, host, port):
         # use sockets!
-        
         #Create a socket first
         try:
-            socket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            aSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print "Socket created"
+            #Bind the socket to specified ports
+            #aSocket.bind((host,port))
         except socket.error as msg:
             print "Failed to create socket"
             print ("Error code: " +str(msg[0]) + ", Error message: "+msg[1])
             sys.exit()
-        print "Socket created"
         
         #Open connection to port and host
-        #ip_address= self.get_host_port(host)
-        #socket.connect((ip_address,port))
-        socket.connect(host,port)
-        return None
+        ip_address= self.get_host_port(host)
+        aSocket.connect((ip_address,port))
+        #socket.connect(host,port)
+        return aSocket
 
     def get_code(self, data):
         return None
@@ -88,18 +89,24 @@ class HTTPClient(object):
 
     def GET(self, url, args=None):
         code = 500
-        #Get ip address and resulting hostname from the url
-        ip_address= self.get_host_port(url)
-        host_name= socket.gethostbyaddr(ip_address)
         
-        body = "GET / HTTP/1.1\nHost: "+host_name+"\nUser-Agent: \nHost: \nAccept: */* \nContent-type: \n"
+        #aSocket= self.connect('',8080)
+        #Get ip address and resulting hostname from the url
+        print "URL is " +url
+        ip_address= self.get_host_port(url)
+        host= socket.gethostbyaddr(ip_address)
+        
+        aSocket=self.connect(host,ip_address)
+        
+        body = "GET / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
+        #Print out to stdout
         print body
         
         return HTTPRequest(code, body)
 
     def POST(self, url, args=None):
         code = 500
-        body = "POST / HTTP/1.1\nHost: \nUser-Agent: \n Host: \nAccept: */* \nContent-type: \n"
+        body = "POST / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
         print body
         return HTTPRequest(code, body)
 
