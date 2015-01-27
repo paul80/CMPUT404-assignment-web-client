@@ -60,10 +60,21 @@ class HTTPClient(object):
             print ("Error code: " +str(msg[0]) + ", Error message: "+msg[1])
             sys.exit()
         
-        #Open connection to port and host
+        '''
         ip_address= self.get_host_port(host)
         aSocket.connect((ip_address,port))
         #socket.connect(host,port)
+        '''
+        try:
+            remote_ip=socket.gethostbyname(host)
+        except socket.gaierror:
+            print "Couldn't resolve hostname"
+            sys.exit()
+        
+        #Need to get the port number though
+        aSocket.connect((remote_ip, port))
+        
+                
         return aSocket
 
     def get_code(self, data):
@@ -89,13 +100,10 @@ class HTTPClient(object):
 
     def GET(self, url, args=None):
         code = 500
-        
-        #aSocket= self.connect('',8080)
-        #Get ip address and resulting hostname from the url
         print "URL is " +url
         ip_address= self.get_host_port(url)
         host= socket.gethostbyaddr(ip_address)
-        
+    
         aSocket=self.connect(host,ip_address)
         
         body = "GET / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
