@@ -31,12 +31,38 @@ class HTTPRequest(object):
     def __init__(self, code=200, body=""):
         self.code = code
         self.body = body
+    
 
 class HTTPClient(object):
-    #def get_host_port(self,url):
-
+    
+    def get_host_port(self,url):
+        try:
+            remote_address=socket.gethostbyname(url)
+            print "IP address of" +url + " is " + remote_address
+            return remote_address            
+        
+        except socket.gaierror:
+            print "Hostname couldn't be resolved"
+            sys.exit()
+            
+     
+        
     def connect(self, host, port):
         # use sockets!
+        
+        #Create a socket first
+        try:
+            socket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        except socket.error as msg:
+            print "Failed to create socket"
+            print ("Error code: " +str(msg[0]) + ", Error message: "+msg[1])
+            sys.exit()
+        print "Socket created"
+        
+        #Open connection to port and host
+        #ip_address= self.get_host_port(host)
+        #socket.connect((ip_address,port))
+        socket.connect(host,port)
         return None
 
     def get_code(self, data):
@@ -62,12 +88,19 @@ class HTTPClient(object):
 
     def GET(self, url, args=None):
         code = 500
-        body = ""
+        #Get ip address and resulting hostname from the url
+        ip_address= self.get_host_port(url)
+        host_name= socket.gethostbyaddr(ip_address)
+        
+        body = "GET / HTTP/1.1\nHost: "+host_name+"\nUser-Agent: \nHost: \nAccept: */* \nContent-type: \n"
+        print body
+        
         return HTTPRequest(code, body)
 
     def POST(self, url, args=None):
         code = 500
-        body = ""
+        body = "POST / HTTP/1.1\nHost: \nUser-Agent: \n Host: \nAccept: */* \nContent-type: \n"
+        print body
         return HTTPRequest(code, body)
 
     def command(self, url, command="GET", args=None):
