@@ -53,30 +53,60 @@ class HTTPClient(object):
         try:
             aSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print "Socket created"
-            #Bind the socket to specified ports
-            #aSocket.bind((host,port))
+            
         except socket.error as msg:
             print "Failed to create socket"
             print ("Error code: " +str(msg[0]) + ", Error message: "+msg[1])
             sys.exit()
         
-        '''
-        ip_address= self.get_host_port(host)
-        aSocket.connect((ip_address,port))
-        #socket.connect(host,port)
-        '''
-        try:
-            remote_ip=socket.gethostbyname(host)
-        except socket.gaierror:
-            print "Couldn't resolve hostname"
-            sys.exit()
+        remote_ip=self.get_host_port(host)
         
-        #Need to get the port number though
-        aSocket.connect((remote_ip, port))
-        
-                
+        aSocket.connect((remote_ip, port))       
         return aSocket
 
+    # http://www.example.com:8080/path/
+    #When split by ":"
+    #Get ['http', '//www.example.com', '8080/path/']
+    def get_parameters(self,url):
+        
+        if ("http://") not in url:
+            url="http://"+url
+            
+        parameters= url.split(":")
+        host=""
+        port_number=80
+        path=""
+        
+        if (len(parameters))>2:
+            #There is a port number
+            host= parameters[1][2:]
+            port_and_path=parameters[-1]
+            
+            if ("/") in port_and_path:
+                index= port_and_path.find("/")
+                port_number= port_and_path[0:index]
+                path=port_and_path[index:]
+            else:
+                port_number=port_and_path[0:]
+                path="/"
+        
+        else:
+            host_and_path=parameters[1][2:]
+            if ("/") in host_and_path:
+                index= host_and_path.find("/")
+                host= host_and_path[:index]
+                path=host_and_path[index:]
+            else:
+                host=host_and_path[0:]
+                path="/"
+        
+        print "Host is " +host
+        print "Path is " +path
+        print "Port number is " +str(port_number)
+        
+        return host,path,port_number
+            
+    
     def get_code(self, data):
         return None
 
@@ -101,13 +131,14 @@ class HTTPClient(object):
     def GET(self, url, args=None):
         code = 500
         print "URL is " +url
-        ip_address= self.get_host_port(url)
-        host= socket.gethostbyaddr(ip_address)
-    
-        aSocket=self.connect(host,ip_address)
+        #ip_address= self.get_host_port(url)
+        #host= socket.gethostbyaddr(ip_address)
+        host,path,port= self.get_parameters(url)
+        aSocket=self.connect(host,port)
         
         body = "GET / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
         #Print out to stdout
+        print("GOT TO GET METHOD")
         print body
         
         return HTTPRequest(code, body)
