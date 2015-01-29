@@ -39,7 +39,7 @@ class HTTPClient(object):
     def get_host_port(self,url):
         try:
             remote_address=socket.gethostbyname(url)
-            print "IP address of" +url + " is " + remote_address
+            print "IP address of " +url + " is " + remote_address
             return remote_address            
         
         except socket.gaierror:
@@ -49,7 +49,7 @@ class HTTPClient(object):
          
     def connect(self, host, port):
         # use sockets!
-        #Create a socket first
+        #Create a socket then connect
         try:
             aSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print "Socket created"
@@ -136,10 +136,18 @@ class HTTPClient(object):
         host,path,port= self.get_parameters(url)
         aSocket=self.connect(host,port)
         
+        '''
         body = "GET / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
         #Print out to stdout
+        '''
         print("GOT TO GET METHOD")
-        print body
+        
+        body= "GET "+path+ "HTTP/1.1\r\nHost: "+host+"\r\n\r\n"
+        #Send to the socket
+        aSocket.sendall(body)
+        #Get back from the socket using recvall
+        data=self.recvall(aSocket)
+        
         
         return HTTPRequest(code, body)
 
