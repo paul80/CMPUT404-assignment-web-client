@@ -109,20 +109,23 @@ class HTTPClient(object):
             
     
     def get_code(self, data):
+        #Find first \r\n to get status line which has the code
         index= data.find("\r\n")
         fragment= data[0:index]
-        #print(fragment)
         fragment=fragment.split(" ")
-        print(fragment)
         code=int(fragment[1])
-        #code= int(data[1])
         return code
 
     def get_headers(self,data):
-        return None
+        #Find "\r\n\r\n" since it denotes the end of the header?
+        index=data.find("\r\n\r\n")
+        fragment=data[0:index]
+        return fragment
 
     def get_body(self, data):
-        return None
+        index=data.find("\r\n\r\n")
+        fragment=data[index:]
+        return fragment
 
     # read everything from the socket
     def recvall(self, sock):
@@ -139,21 +142,14 @@ class HTTPClient(object):
     def GET(self, url, args=None):
         code = 500
         print "URL is " +url
-        #ip_address= self.get_host_port(url)
-        #host= socket.gethostbyaddr(ip_address)
         host,path,port= self.get_parameters(url)
         aSocket=self.connect(host,port)
-        
-        '''
-        body = "GET / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
-        #Print out to stdout
-        '''
+
         print("GOT TO GET METHOD")
         print("---------------------------------------")
-        #body= "GET "+path+ "HTTP/1.1\r\nHost: "+host+"\r\n\Accept: */*\r\n\r\n"
-        #message="GET / HTTP/1.1\r\n\r\n"
-        #message= "GET "+path+ "HTTP/1.1\r\nHost: "+host+"\r\n\Accept: */*\r\nConnection:close\r\n\r\n"
         message= "GET / HTTP/1.1\r\nHost: "+host+"\r\nAccept:*/*\r\nConnection:close\r\n\r\n"
+        #message= "GET / HTTP/1.1\r\nHost: "+host+"\r\nAccept:*/*\r\n\r\n"
+        
         #Send to the socket
         try:
             aSocket.sendall(message)
@@ -163,12 +159,19 @@ class HTTPClient(object):
             
         #Get back from the socket using recvall
         data=self.recvall(aSocket)
-        #Need to parse the data received back presumably
-        #print(data)
+        #Need to parse the data received back
+        #print statements are for debugging
+        
         code=self.get_code(data)
-        print(code)
-
-        return "Done"
+        print("Code is:" +str(code))
+        print("---------------------------")
+        header=self.get_headers(data)
+        print(header)
+        print("----------------------------")
+        body=self.get_body(data)
+        #print(body)
+        #return "Done"
+        return HTTPRequest(code,body)
 
     def POST(self, url, args=None):
         code = 500
