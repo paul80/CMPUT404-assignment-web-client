@@ -61,7 +61,8 @@ class HTTPClient(object):
         
         remote_ip=self.get_host_port(host)
         
-        aSocket.connect((remote_ip, port))       
+        aSocket.connect((remote_ip, port)) 
+        print 'Socket Connected to ' + host + ' on ip ' + remote_ip + " by port " +str(port)
         return aSocket
 
     # http://www.example.com:8080/path/
@@ -108,7 +109,14 @@ class HTTPClient(object):
             
     
     def get_code(self, data):
-        return None
+        index= data.find("\r\n")
+        fragment= data[0:index]
+        #print(fragment)
+        fragment=fragment.split(" ")
+        print(fragment)
+        code=int(fragment[1])
+        #code= int(data[1])
+        return code
 
     def get_headers(self,data):
         return None
@@ -141,15 +149,26 @@ class HTTPClient(object):
         #Print out to stdout
         '''
         print("GOT TO GET METHOD")
-        
-        body= "GET "+path+ "HTTP/1.1\r\nHost: "+host+"\r\n\r\n"
+        print("---------------------------------------")
+        #body= "GET "+path+ "HTTP/1.1\r\nHost: "+host+"\r\n\Accept: */*\r\n\r\n"
+        #message="GET / HTTP/1.1\r\n\r\n"
+        #message= "GET "+path+ "HTTP/1.1\r\nHost: "+host+"\r\n\Accept: */*\r\nConnection:close\r\n\r\n"
+        message= "GET / HTTP/1.1\r\nHost: "+host+"\r\nAccept:*/*\r\nConnection:close\r\n\r\n"
         #Send to the socket
-        aSocket.sendall(body)
+        try:
+            aSocket.sendall(message)
+        except socket.error:
+            print("Sending data failed")
+            sys.exit()
+            
         #Get back from the socket using recvall
         data=self.recvall(aSocket)
-        
-        
-        return HTTPRequest(code, body)
+        #Need to parse the data received back presumably
+        #print(data)
+        code=self.get_code(data)
+        print(code)
+
+        return "Done"
 
     def POST(self, url, args=None):
         code = 500
