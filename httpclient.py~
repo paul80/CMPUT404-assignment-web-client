@@ -91,7 +91,7 @@ class HTTPClient(object):
             else:
                 port_number=port_and_path[0:]
                 port_number=int(port_number)
-                path=""
+                path="/"
         
         else:
             host_and_path=parameters[1][2:]
@@ -101,7 +101,7 @@ class HTTPClient(object):
                 path=host_and_path[index:]
             else:
                 host=host_and_path[0:]
-                path=""
+                path="/"
         
         print "Host is " +host
         print "Path is " +path
@@ -196,7 +196,7 @@ class HTTPClient(object):
         
         print("IN POST METHOD")
         print("------------------")
-        message= "POST /"+path+ " HTTP/1.1\r\nHost: "+host+"\r\nAccept: */*\r\nContent-Length: "+str(len(encoding))+"\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"+encoding
+        message= "POST /"+path+ "HTTP/1.1\r\nHost: "+host+"\r\nAccept: */*\r\nContent-Length: "+str(len(encoding))+"\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"+encoding
         
         #Send to the socket
         try:
