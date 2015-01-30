@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright 2013 Abram Hindle
+# Copyright 2015 Paul Nhan, Jessica Surya
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+#Original creator: Abram Hindle
+#Assignment contributors: Paul Nhan (pnhan), Jessica Surya (jsurya)
+#CMPUT 410 Assignment 2 Submission
 
 # Do not use urllib's HTTP GET and POST mechanisms.
 # Write your own HTTP GET and POST
