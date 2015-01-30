@@ -87,8 +87,10 @@ class HTTPClient(object):
                 index= port_and_path.find("/")
                 port_number= port_and_path[0:index]
                 path=port_and_path[index:]
+                port_number=int(port_number)
             else:
                 port_number=port_and_path[0:]
+                port_number=int(port_number)
                 path="/"
         
         else:
