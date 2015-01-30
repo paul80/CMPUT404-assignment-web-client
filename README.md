@@ -19,3 +19,6 @@ compatible) http://docs.python.org/2/library/socketserver.html
 
 Contributors to CMPUT410 Assignment 2 Winter 2015: Paul Nhan, Jessica Surya
 
+Sources: 
+- Python socket programming tutorial: http://www.binarytides.com/python-socket-programming-tutorial/ , author alias/name: Silver Moon
+
