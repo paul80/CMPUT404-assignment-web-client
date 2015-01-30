@@ -26,8 +26,8 @@ import re
 import urllib
 
 def help():
-    print "httpclient.py [GET/POST] [URL]\n"
-
+    #print "httpclient.py [GET/POST] [URL]\n"
+    print "httpclient.py [URL] [GET/POST]\n"
 class HTTPRequest(object):
     def __init__(self, code=200, body=""):
         self.code = code
@@ -140,7 +140,7 @@ class HTTPClient(object):
         return str(buffer)
 
     def GET(self, url, args=None):
-        code = 500
+        #code = 500
         print "URL is " +url
         host,path,port= self.get_parameters(url)
         aSocket=self.connect(host,port)
@@ -174,9 +174,47 @@ class HTTPClient(object):
         return HTTPRequest(code,body)
 
     def POST(self, url, args=None):
-        code = 500
-        body = "POST / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
-        print body
+        #code = 500
+        #body = "POST / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
+        print "URL is " +url
+        host,path,port= self.get_parameters(url)
+        aSocket=self.connect(host,port)
+        
+        #args is the data to post?
+        if args!=None:
+            encoding=urllib.urlencode(args)
+        else:
+            encoding=''
+            
+        
+        
+        
+        print("IN POST METHOD")
+        print("------------------")
+        message= "POST /"+path+ "HTTP/1.1\r\nHost: "+host+"\r\nAccept: */*\r\nContent-Length: "+str(len(encoding))+"\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"+encoding
+        
+        #Send to the socket
+        try:
+            aSocket.sendall(message)
+        except socket.error:
+            print("Sending data failed")
+            sys.exit()
+            
+        #Get back from the socket using recvall
+        data=self.recvall(aSocket)
+        #Need to parse the data received back
+        #print statements are for debugging
+        
+        code=self.get_code(data)
+        print("Code is:" +str(code))
+        print("---------------------------")
+        header=self.get_headers(data)
+        print(header)
+        print("----------------------------")
+        body=self.get_body(data)
+        #print(body)
+        #return "Done"        
+        
         return HTTPRequest(code, body)
 
     def command(self, url, command="GET", args=None):
@@ -192,6 +230,8 @@ if __name__ == "__main__":
         help()
         sys.exit(1)
     elif (len(sys.argv) == 3):
-        print client.command( sys.argv[1], sys.argv[2] )
+        #print client.command( sys.argv[1], sys.argv[2] )
+        print client.command (sys.argv[2],sys.argv[1])
     else:
-        print client.command( command, sys.argv[1] )    
+        #print client.command( command, sys.argv[1] )  
+        print client.command(sys.argv[1],command)
