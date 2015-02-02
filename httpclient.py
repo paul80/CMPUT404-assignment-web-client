@@ -30,8 +30,9 @@ import re
 import urllib
 
 def help():
-    #print "httpclient.py [GET/POST] [URL]\n"
-    print "httpclient.py [URL] [GET/POST]\n"
+    print "httpclient.py [GET/POST] [URL]\n"
+    #print "httpclient.py [URL] [GET/POST]\n"
+    
 class HTTPRequest(object):
     def __init__(self, code=200, body=""):
         self.code = code
@@ -95,7 +96,7 @@ class HTTPClient(object):
             else:
                 port_number=port_and_path[0:]
                 port_number=int(port_number)
-                path=""
+                #path=""
         
         else:
             host_and_path=parameters[1][2:]
@@ -105,11 +106,7 @@ class HTTPClient(object):
                 path=host_and_path[index:]
             else:
                 host=host_and_path[0:]
-                path=""
-        
-        print "Host is " +host
-        print "Path is " +path
-        print "Port number is " +str(port_number)
+                #path=""
         
         return host,path,port_number
             
@@ -123,7 +120,7 @@ class HTTPClient(object):
         return code
 
     def get_headers(self,data):
-        #Find "\r\n\r\n" since it denotes the end of the header?
+        #Find "\r\n\r\n" since it denotes the end of the header
         index=data.find("\r\n\r\n")
         fragment=data[0:index]
         return fragment
@@ -147,14 +144,9 @@ class HTTPClient(object):
 
     def GET(self, url, args=None):
         #code = 500
-        print "URL is " +url
         host,path,port= self.get_parameters(url)
         aSocket=self.connect(host,port)
-
-        print("GOT TO GET METHOD")
-        print("---------------------------------------")
         message= "GET /"+path+" HTTP/1.1\r\nHost: "+host+"\r\nAccept:*/*\r\nConnection:close\r\n\r\n"
-        #message= "GET / HTTP/1.1\r\nHost: "+host+"\r\nAccept:*/*\r\n\r\n"
         
         #Send to the socket
         try:
@@ -164,42 +156,25 @@ class HTTPClient(object):
             sys.exit()
             
         #Get back from the socket using recvall
-        data=self.recvall(aSocket)
         #Need to parse the data received back
-        #print statements are for debugging
-        
+        data=self.recvall(aSocket) 
         code=self.get_code(data)
-        print("Code is:" +str(code))
-        print("---------------------------")
-        
-        #404 error testing here
-        
+                
         header=self.get_headers(data)
-        print(header)
-        print("----------------------------")
         body=self.get_body(data)
-        #print(body)
-        #return "Done"
         return HTTPRequest(code,body)
 
     def POST(self, url, args=None):
         #code = 500
-        #body = "POST / HTTP/1.1\r\nUser-Agent: \r\nHost: \r\nAccept: */*\r\n \r\n"
-        print "URL is " +url
         host,path,port= self.get_parameters(url)
         aSocket=self.connect(host,port)
         
-        #args is the data to post?
+        #if there are args, encode it, else args is set to empty string
         if args!=None:
             encoding=urllib.urlencode(args)
         else:
             encoding=''
-            
-        
-        
-        
-        print("IN POST METHOD")
-        print("------------------")
+
         message= "POST /"+path+ " HTTP/1.1\r\nHost: "+host+"\r\nAccept: */*\r\nContent-Length: "+str(len(encoding))+"\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"+encoding
         
         #Send to the socket
@@ -210,19 +185,12 @@ class HTTPClient(object):
             sys.exit()
             
         #Get back from the socket using recvall
+        #Need to parse the data received back        
         data=self.recvall(aSocket)
-        #Need to parse the data received back
-        #print statements are for debugging
         
         code=self.get_code(data)
-        print("Code is:" +str(code))
-        print("---------------------------")
         header=self.get_headers(data)
-        print(header)
-        print("----------------------------")
         body=self.get_body(data)
-        #print(body)
-        #return "Done"        
         
         return HTTPRequest(code, body)
 
@@ -238,6 +206,8 @@ if __name__ == "__main__":
     if (len(sys.argv) <= 1):
         help()
         sys.exit(1)
+        
+     # Note: The arguments are reversed to comply with project specifications
     elif (len(sys.argv) == 3):
         #print client.command( sys.argv[1], sys.argv[2] )
         print client.command (sys.argv[2],sys.argv[1])
